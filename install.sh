@@ -17,8 +17,8 @@ apt-get update -y
 echo "==> Installing required packages (git, curl, speedtest-cli)..."
 apt-get install -y git curl speedtest-cli
 
-echo "==> Installing Node.js 16.x..."
-curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+echo "==> Installing Node.js 22.x..."
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt-get install -y nodejs
 
 echo "==> Cloning or updating server-metrics-api in the current directory..."

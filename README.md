@@ -36,7 +36,7 @@ This repository provides a Node.js and Express-based API to gather real-time ser
 ## Requirements
 
 - **Ubuntu/Debian** server (tested on Ubuntu 24.04 LTS)  
-- **Node.js 16.x** or higher (automatically installed by `install.sh`)  
+- **Node.js 22.x** or higher (automatically installed by `install.sh`)  
 - **speedtest-cli** (Python-based, automatically installed by `install.sh`)  
 - **git**, **curl** (also installed by `install.sh`)  
 - **Systemd** (already present on most modern distros)
@@ -123,3 +123,7 @@ This project is available under the [MIT License](LICENSE). You’re free to use
 
 **Enjoy your Server Metrics API!**
 ```
+
+--- 
+
+**Tip**: If your repository has a different branch structure (e.g., `main` vs. `master`), update the script and instructions to match. Also, tweak any references to `config.json` keys, token usage, or default port to reflect your actual code.
