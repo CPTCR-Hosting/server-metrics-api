@@ -123,7 +123,3 @@ This project is available under the [MIT License](LICENSE). You’re free to use
 
 **Enjoy your Server Metrics API!**
 ```
-
---- 
-
-**Tip**: If your repository has a different branch structure (e.g., `main` vs. `master`), update the script and instructions to match. Also, tweak any references to `config.json` keys, token usage, or default port to reflect your actual code.
