@@ -1,13 +1,10 @@
-const { getCpuUsage, getMemoryInfo, getStorageUsage, getNetworkSpeed } = require("../server/data/metrics");
+const axios = require("axios");
+const token = require("../config.json").token;
 
-(async () => {
-    try {
-      console.log('CPU Usage:', await getCpuUsage());
-      console.log('Memory Info:', await getMemoryInfo());
-      console.log('Storage Usage:', await getStorageUsage());
-      console.log('Network Speed:', await getNetworkSpeed());
-    } catch (err) {
-      console.error('Error gathering metrics:', err);
+const resp = await axios.get("http://nl1.node.cptcr.cc:3022/server-data-api/", {
+    headers: {
+        "Authorization": `${token}`
     }
-})();
-  
+});
+
+console.log(resp);

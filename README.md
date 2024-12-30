@@ -1,19 +1,24 @@
 # Server Metrics API
 
-This repository provides a Node.js and Express-based API to gather real-time server metrics:
+This repository provides a Node.js + Express API to fetch essential server metrics, including:
 
 - **CPU Usage**  
 - **Memory (RAM) Usage**  
 - **Storage Usage**  
-- **Network Speed** (via `speedtest-cli`)
+- **Network Speed** (via `speedtest-cli`)  
+
+[![GitHub all releases](https://img.shields.io/github/downloads/CPTCR-Hosting/server-metrics-api/total.svg)](https://github.com/CPTCR-Hosting/server-metrics-api/releases)
+
+
+---
 
 ## Table of Contents
 
 - [Features](#features)
 - [Requirements](#requirements)
+- [Project Structure](#project-structure)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Logs & Debugging](#logs--debugging)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -21,109 +26,110 @@ This repository provides a Node.js and Express-based API to gather real-time ser
 
 ## Features
 
-1. **Secure Access with Token**  
-   - A token-based authentication flow is set up via `config.json` (e.g., `port` and `token`).
+1. **Secure Token-Based Access**  
+   - A token set in `config.json` (or updated during installation) restricts unauthorized requests.
 
-2. **Lightweight & Modular**  
-   - All metric-gathering code is modularized in `metrics.js`.  
-   - Easily expandable for additional endpoints or metrics.
+2. **Customizable Port**  
+   - Choose your desired port in `config.json` or via the installer prompt.
 
-3. **Automatic Installation Script**  
-   - `install.sh` handles installing prerequisites (Node.js 16.x, `speedtest-cli`, `git`, `curl`), cloning or updating this repository in the **current** directory, installing dependencies, and then **running** the server immediately.
+3. **Endpoints**  
+   - **GET** `/server-data-api` – returns JSON with CPU, RAM, Storage, and Network Speed data.
+
+4. **Automatic Installer**  
+   - A single `install.sh` script that installs all dependencies, clones the repo, configures your token/port, and runs the server.
 
 ---
 
 ## Requirements
 
-- **Ubuntu/Debian** server (tested on Ubuntu 24.04 LTS)  
-- **Node.js 22.x** or higher (automatically installed by `install.sh`)  
-- **speedtest-cli** (Python-based, automatically installed by `install.sh`)  
-- **git**, **curl** (also installed by `install.sh`)  
-- **Systemd** (already present on most modern distros)
+- **Ubuntu/Debian** system (e.g., Ubuntu 24.04 LTS).  
+- **sudo** or root privileges to run the installer (since it installs system packages).  
+- **Node.js 16.x** or higher (automatically installed via the installer).  
+- **speedtest-cli** (also installed by the script).  
+- **git**, **curl** (installed by the script).  
+
+---
+
+## Project Structure
+
+Below is a simplified view of how the code is organized:
+
+```
+.
+├─ api/
+│  └─ index.js          # Main server entry point
+├─ server/
+│  └─ data/
+│     └─ metrics.js     # Logic for gathering CPU, RAM, Storage, and Network Speed
+├─ testing/
+│  └─ test.js           # Example tests (if any)
+├─ config.json          # Holds default port/token
+├─ install.sh           # Installer script
+├─ package.json
+├─ package-lock.json
+└─ README.md
+```
 
 ---
 
 ## Installation
 
-To install and run the Server Metrics API in the **current directory**:
+1. **Download** and **run** the installer script:
+   ```bash
+   # Move into a temporary directory or your preferred location
+   cd /tmp
 
-1. Download the installer script (e.g., from GitHub’s raw link):
-   ```bash
+   # Download the install script
    curl -fsSL https://raw.githubusercontent.com/CPTCR-Hosting/server-metrics-api/main/install.sh -o install.sh
-   ```
-2. Make it executable:
-   ```bash
+
+   # Make it executable
    chmod +x install.sh
-   ```
-3. Run it with `sudo` or as root:
-   ```bash
+
+   # Run it with sudo
    sudo ./install.sh
    ```
 
-**What the script does**:
-- Updates package lists, installs Node.js 16.x, `git`, `curl`, `speedtest-cli`.
-- Clones (or pulls) the `server-metrics-api` repository **into the current folder**.
-- Installs all Node dependencies (including `chalk@4.1.0`).
-- **Immediately runs** `node src/index.js` in the foreground after installation.
+2. **Enter Token & Port (Optional)**  
+   - During installation, the script prompts you for a **token** and **port**.  
+   - If you press Enter without typing anything, it keeps the defaults in `config.json`.
 
-> **Note**: If you want the server to keep running in the background or start on reboot, you can later configure a **systemd** service or a process manager like **pm2**.
+3. **Foreground Launch**  
+   - After installing dependencies and updating `config.json`, the installer **automatically starts** `node api/index.js` in the **foreground**.  
+   - Press **Ctrl + C** to stop the server.
 
 ---
 
 ## Usage
 
-After installation completes, the installer script launches the server in the foreground. Use **Ctrl+C** to stop it. To manually restart it later:
+- **Default Port**: The API typically listens on `3000` (or whatever you set in `config.json` or during the installer prompt).  
+- **Token**: The API expects an `Authorization` header matching the token in `config.json`.  
+
+### Example Request
 
 ```bash
-cd /path/to/server-metrics-api   # if not already there
-node src/index.js
+curl -H "Authorization: your_token_here" http://YOUR_SERVER_IP:3000/server-data-api
 ```
 
-### API Endpoints
-
-- **GET** `/server-data-api`  
-  - Requires an **Authorization** header matching the token defined in `config.json`.  
-  - Returns a JSON response with CPU, Memory, Storage, and Network Speed data.
-
-#### Example Request
-
-```bash
-curl -H "Authorization: my_token_here" http://localhost:3000/server-data-api
-```
-
----
-
-## Logs & Debugging
-
-Since this repository simply uses `node src/index.js` to run, your logs will appear in the terminal. If you want more advanced logging:
-
-1. Use a **process manager** like **pm2** or **forever**.  
-2. Create a **systemd service** to capture logs via `journalctl`.
+You should receive a JSON response with server metrics. Adjust the port/token to match your configuration.
 
 ---
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome!  
-Feel free to open a pull request or file an issue on GitHub.
+Contributions, bug reports, and feature requests are welcome!
 
-1. **Fork** the repository.  
-2. Create a **feature branch**: `git checkout -b feature-name`.  
-3. Commit your changes: `git commit -m 'Add a feature'`.  
-4. Push your branch: `git push origin feature-name`.  
-5. Open a **Pull Request**.
+1. **Fork** the repo.  
+2. Create a **new branch**: `git checkout -b feature-branch`.  
+3. Commit changes: `git commit -am 'Add new feature'`.  
+4. Push to your branch: `git push origin feature-branch`.  
+5. Open a **Pull Request** on GitHub.
 
 ---
 
 ## License
 
-This project is available under the [MIT License](LICENSE). You’re free to use it, fork it, and modify it. See the `LICENSE` file for details.
+This project is available under the [MIT License](LICENSE). You are free to use, modify, and distribute this software. See the `LICENSE` file for more details.
 
 ---
 
 **Enjoy your Server Metrics API!**
-```
-
---- 
-
-**Tip**: If your repository has a different branch structure (e.g., `main` vs. `master`), update the script and instructions to match. Also, tweak any references to `config.json` keys, token usage, or default port to reflect your actual code.

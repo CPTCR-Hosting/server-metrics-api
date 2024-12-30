@@ -3,48 +3,40 @@ const { exec } = require('child_process');
 
 /**
  * Retrieves memory information:
- * total, free, used, active, available, etc.
- * @returns {Promise<object>}
-*/
+ * RAM: usedMegabytes/AvailableGigabytes
+ * @returns {Promise<string>}
+ */
 async function getMemoryInfo() {
   const mem = await si.mem();
-  return {
-    total: mem.total,       //in bytes
-    free: mem.free,         //in bytes
-    used: mem.used,         //in bytes
-    active: mem.active,     //actively used memory (bytes)
-    available: mem.available,
-  };
+  const usedMegabytes = (mem.used / (1024 * 1024)).toFixed(2); // Convert bytes to MB
+  const availableGigabytes = (mem.available / (1024 * 1024 * 1024)).toFixed(2); // Convert bytes to GB
+  return `RAM: ${usedMegabytes}MB/${availableGigabytes}GB`;
 }
 
 /**
- * Gets current CPU load (averaged percentage).
- * @returns {Promise<object>}
-*/
-async function getCpuUsage() {
-  const load = await si.currentLoad();
-  return {
-    avgLoad: load.avgLoad,               //Average load across cores
-    currentLoad: load.currentLoad,       //Overall % CPU load
-    currentLoadUser: load.currentLoadUser,
-    currentLoadSystem: load.currentLoadSystem,
-  };
-}
-
-/**
- * Retrieves storage usage (file system sizes).
- * @returns {Promise<object[]>}
-*/
+ * Retrieves storage usage:
+ * Storage: storageUsedGB/storageTotalGB
+ * @returns {Promise<string[]>}
+ */
 async function getStorageUsage() {
   const fsData = await si.fsSize();
-  return fsData.map((disk) => ({
-    fs: disk.fs,
-    type: disk.type,
-    size: disk.size,            //total in bytes
-    used: disk.used,            //used in bytes
-    available: disk.size - disk.used,
-    usePercentage: disk.use,    //usage % (0-100)
-  }));
+  return fsData.map((disk) => {
+    const storageUsedGB = (disk.used / (1024 * 1024 * 1024)).toFixed(2); // Convert bytes to GB
+    const storageTotalGB = (disk.size / (1024 * 1024 * 1024)).toFixed(2); // Convert bytes to GB
+    return `Storage: ${storageUsedGB}GB/${storageTotalGB}GB`;
+  });
+}
+
+/**
+ * Gets current CPU load:
+ * CPU: usedCpu%/maxCpu%
+ * @returns {Promise<string>}
+ */
+async function getCpuUsage() {
+  const load = await si.currentLoad();
+  const usedCpu = load.currentLoad.toFixed(2); // Current CPU load percentage
+  const maxCpu = 100; // Assuming max CPU load is 100%
+  return `CPU: ${usedCpu}%/${maxCpu}%`;
 }
 
 /**
@@ -54,30 +46,34 @@ async function getStorageUsage() {
  * - ping is in milliseconds
  *
  * @returns {Promise<{ download: number, upload: number, ping: number }>}
-*/
+ */
 async function getNetworkSpeed() {
-    return new Promise((resolve, reject) => {
-      // speedtest-cli with JSON output
-      exec('speedtest-cli --json', (error, stdout) => {
-        if (error) {
-          return reject(error);
-        }
-  
-        try {
-          const data = JSON.parse(stdout);
-  
-          // speedtest-cli JSON format typically has:
-          // download (bits/s), upload (bits/s), ping (ms)
-          const download = data.download || 0; 
-          const upload = data.upload || 0;
-          const ping = data.ping || 0;
-  
-          resolve({ download, upload, ping });
-        } catch (err) {
-          reject(err);
-        }
-      });
+  return new Promise((resolve, reject) => {
+    // speedtest-cli with JSON output
+    exec('speedtest-cli --json', (error, stdout) => {
+      if (error) {
+        return reject(error);
+      }
+
+      try {
+        const data = JSON.parse(stdout);
+
+        // speedtest-cli JSON format typically has:
+        // download (bits/s), upload (bits/s), ping (ms)
+        const download = data.download || 0; 
+        const upload = data.upload || 0;
+        const ping = data.ping || 0;
+
+        resolve({ 
+          upload: `Upload Speed: ${upload}`, 
+          download: `Download Speed: ${download}`, 
+          ping: `Ping: ${ping}` 
+        });
+      } catch (err) {
+        reject(err);
+      }
     });
+  });
 }
 
 module.exports = {

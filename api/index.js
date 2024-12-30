@@ -40,10 +40,10 @@ app.get("/server-data-api", async (req, res) => {
 
     //3. Return as JSON.
     return res.json({
-      cpuUsage,
-      memoryInfo,
-      storageUsage,
-      networkSpeed,
+      cpu: cpuUsage,
+      ram: memoryInfo,
+      rom: storageUsage,
+      network: networkSpeed,
     });
   } catch (err) {
     console.error(chalk.red("[ ERROR ] Error fetching server data:"), err);
