@@ -36,7 +36,7 @@ This repository provides a Node.js and Express-based API to gather real-time ser
 ## Requirements
 
 - **Ubuntu/Debian** server (tested on Ubuntu 24.04 LTS)  
-- **Node.js 16.x** or higher (automatically installed by `install.sh`)  
+- **Node.js 22.x** or higher (automatically installed by `install.sh`)  
 - **speedtest-cli** (Python-based, automatically installed by `install.sh`)  
 - **git**, **curl** (also installed by `install.sh`)  
 - **Systemd** (already present on most modern distros)
